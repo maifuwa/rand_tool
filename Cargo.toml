@@ -1,6 +1,6 @@
 [package]
 name = "rand_tool"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 license = "MIT"
 readme = "README.md"
@@ -11,3 +11,4 @@ description = "Powerful command-line tool for generating strong, random password
 clap = { version = "4.5.21", features = ["derive"] }
 passwords = "3.1.16"
 rand = "0.8.5"
+uuid = { version = "1.11.0", features = ["v4"] }
