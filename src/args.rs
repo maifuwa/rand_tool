@@ -1,6 +1,6 @@
 use clap::Parser;
 
-#[derive(Parser)]
+#[derive(Parser, Debug)]
 #[command(version, about)]
 pub struct Args {
     /// Generates random ports instead of passwords.
@@ -38,5 +38,4 @@ pub struct Args {
     /// Include special characters in the password.
     #[arg(short, long, action = clap::ArgAction::SetTrue)]
     pub symbols: bool,
-
 }

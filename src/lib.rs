@@ -52,3 +52,16 @@ pub fn generate_password(args: Args) {
         println!("password: {}  score: {:.3}", pwd, score);
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_parse_range() {
+        let range = "1000-2000";
+        let (range_start, range_end) = parse_range(range);
+        assert_eq!(range_start, 1000);
+        assert_eq!(range_end, 2000);
+    }
+}
