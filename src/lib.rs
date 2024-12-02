@@ -39,7 +39,7 @@ pub fn generate_password(args: Args) {
         .lowercase_letters(args.lowercase)
         .uppercase_letters(args.uppercase)
         .symbols(args.symbols)
-        .spaces(args.spaces)
+        .spaces(false)
         .exclude_similar_characters(true)
         .strict(true);
 
