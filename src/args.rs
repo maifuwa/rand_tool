@@ -11,13 +11,13 @@ pub struct Args {
     #[arg(short = 'U', long, action = clap::ArgAction::SetTrue)]
     pub uuid: bool,
 
+    /// enable base64 decoding
+    #[arg(short = 'B', long, action = clap::ArgAction::SetTrue)]
+    pub base64: bool,
+
     /// Set the number of passwords or ports to generate.
     #[arg(short, long, default_value = "5")]
     pub count: u8,
-
-    /// Set the range of ports to generate.
-    #[arg(short, long, default_value = "1024-49151")]
-    pub range: String,
 
     /// Set the password length.
     #[arg(short, long, default_value = "18")]
@@ -38,4 +38,10 @@ pub struct Args {
     /// Include special characters in the password.
     #[arg(short, long, action = clap::ArgAction::SetTrue)]
     pub symbols: bool,
+
+    /// Additional message:
+    /// - Port generation: range of ports default 1024-49151
+    /// - Base64 decode: base64 string
+    #[arg()]
+    pub additional: Option<String>,
 }

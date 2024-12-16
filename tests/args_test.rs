@@ -7,7 +7,6 @@ fn test_default_args() {
     assert!(!args.port);
     assert!(!args.uuid);
     assert_eq!(args.count, 5);
-    assert_eq!(args.range, "1024-49151");
     assert_eq!(args.length, 18);
     assert!(args.number);
     assert!(args.uppercase);
@@ -31,12 +30,6 @@ fn test_uuid_arg() {
 fn test_count_arg() {
     let args = Args::parse_from(&["test", "-c", "10"]);
     assert_eq!(args.count, 10);
-}
-
-#[test]
-fn test_range_arg() {
-    let args = Args::parse_from(&["test", "-r", "2000-3000"]);
-    assert_eq!(args.range, "2000-3000");
 }
 
 #[test]
@@ -68,4 +61,3 @@ fn test_symbols_arg() {
     let args = Args::parse_from(&["test", "-s"]);
     assert!(args.symbols);
 }
- 
