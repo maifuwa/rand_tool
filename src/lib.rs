@@ -1,97 +1,58 @@
-use std::fs;
-
-use args::Args;
-use base64::{prelude::BASE64_STANDARD, Engine};
-use passwords::{analyzer, scorer, PasswordGenerator};
+use base64::prelude::BASE64_STANDARD;
+use base64::Engine;
+use passwords::analyzer::analyze;
+use passwords::scorer::score;
+use passwords::PasswordGenerator;
 use rand::Rng;
+use std::collections::HashMap;
+use std::error::Error;
+use uuid::Uuid;
 
-pub mod args;
-
-/// Generate random port numbers
-pub fn generate_port(args: Args) {
-    let range = args.additional.unwrap_or("1024-49151".to_string());
-    let (range_start, range_end) = parse_range(&range);
-    println!("generated port range: {}-{}", range_start, range_end);
-
-    let mut rng = rand::thread_rng();
-    for _ in 0..args.count {
-        let port: usize = rng.gen_range(range_start..=range_end);
-        println!("{}", port);
-    }
-}
-
-/// Parse a range string into a tuple of start and end values
-fn parse_range(range: &str) -> (usize, usize) {
-    let parts: Vec<&str> = range.split('-').collect();
-    let range_start = parts[0].parse::<usize>().unwrap();
-    let range_end = parts[1].parse::<usize>().unwrap();
-    (range_start, range_end)
-}
-
-/// Generate random UUIDs
-pub fn generate_uuid(args: Args) {
-    println!("generated v4 uuids:");
-    for _ in 0..args.count {
-        let uuid = uuid::Uuid::new_v4();
-        println!("{}", uuid);
-    }
-}
-
-/// Generate random passwords
-pub fn generate_password(args: Args) {
+pub fn generate_pwd(
+    length: u8,
+    numbers: bool,
+    uppercase: bool,
+    lowercase: bool,
+    symbols: bool,
+    count: u8,
+) -> HashMap<String, String> {
     let pg = PasswordGenerator::new()
-        .length(args.length as usize)
-        .numbers(args.number)
-        .lowercase_letters(args.lowercase)
-        .uppercase_letters(args.uppercase)
-        .symbols(args.symbols)
+        .length(length as usize)
+        .numbers(numbers)
+        .lowercase_letters(uppercase)
+        .uppercase_letters(lowercase)
+        .symbols(symbols)
         .spaces(false)
         .exclude_similar_characters(true)
         .strict(true);
 
-    let pwds = pg.generate(args.count as usize).unwrap();
+    let pwds = pg
+        .generate(count as usize)
+        .expect("Unable to generate passwords");
 
-    println!("generated passwords:");
+    let scores: Vec<_> = pwds
+        .iter()
+        .map(|pw| score(&analyze(pw)).to_string())
+        .collect();
 
-    for pwd in pwds {
-        let score = scorer::score(&analyzer::analyze(&pwd));
-        println!("password: {}  score: {:.3}", pwd, score);
-    }
+    pwds.into_iter().zip(scores).collect()
 }
 
-/// Decode a base64 string
-pub fn base64_decode(args: Args) {
-    let base64: String = if let Some(additional) = args.additional {
-        match fs::metadata(&additional) {
-            Ok(_) => fs::read_to_string(&additional).unwrap(),
-            Err(_) => additional,
-        }
-    } else {
-        eprintln!("No base64 string provided");
-        return;
-    };
+pub fn generate_port(start: u16, end: u16, count: u8) -> Vec<u16> {
+    let mut rng = rand::rng();
 
-    let decoded = match BASE64_STANDARD.decode(base64.as_bytes()) {
-        Ok(decoded) => decoded,
-        Err(e) => {
-            eprintln!("Error decoding base64: {}", e);
-            return;
-        }
-    };
-
-    let original_str = String::from_utf8_lossy(&decoded).to_string();
-    println!("original_str: {}", original_str);
+    (0..count).map(|_| rng.random_range(start..end)).collect()
 }
 
-#[cfg(test)]
-mod test {
-    use super::*;
+pub fn generate_uuid(count: u8) -> Vec<String> {
+    (0..count).map(|_| Uuid::new_v4().to_string()).collect()
+}
 
-    #[test]
-    fn test_parse_range() {
-        let range = "1000-2000";
-        let (range_start, range_end) = parse_range(range);
-        assert_eq!(range_start, 1000);
-        assert_eq!(range_end, 2000);
-    }
+pub fn base64_decode(content: String) -> Result<String, Box<dyn Error>> {
+    let decode = BASE64_STANDARD.decode(content.as_bytes())?;
+    Ok(String::from_utf8(decode)?)
+}
+
+pub fn base64_encode(content: String) -> String {
+    BASE64_STANDARD.encode(content.as_bytes())
 }
