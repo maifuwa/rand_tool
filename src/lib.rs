@@ -15,12 +15,12 @@ pub fn generate_pwd(
     lowercase: bool,
     symbols: bool,
     count: u8,
-) -> HashMap<String, String> {
+) -> HashMap<String, f64> {
     let pg = PasswordGenerator::new()
         .length(length as usize)
         .numbers(numbers)
-        .lowercase_letters(uppercase)
-        .uppercase_letters(lowercase)
+        .lowercase_letters(lowercase)
+        .uppercase_letters(uppercase)
         .symbols(symbols)
         .spaces(false)
         .exclude_similar_characters(true)
@@ -30,10 +30,7 @@ pub fn generate_pwd(
         .generate(count as usize)
         .expect("Unable to generate passwords");
 
-    let scores: Vec<_> = pwds
-        .iter()
-        .map(|pw| score(&analyze(pw)).to_string())
-        .collect();
+    let scores: Vec<_> = pwds.iter().map(|pw| score(&analyze(pw))).collect();
 
     pwds.into_iter().zip(scores).collect()
 }

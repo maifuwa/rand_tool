@@ -6,7 +6,7 @@ const DEFAULT_PORT_END: u16 = 49151;
 const DEFAULT_PORT_RANGE: &str = "1024-49151";
 
 #[derive(Parser, Debug)]
-#[command(name = "rand_tool", version, about)]
+#[command(name = "rand_tool", version, about, subcommand_required = true)]
 struct Cli {
     #[clap(subcommand)]
     command: Command,
@@ -38,7 +38,7 @@ enum Command {
         lowercase: bool,
 
         /// Include special characters (default: false)
-        #[arg(long, short, action = clap::ArgAction::SetTrue)]
+        #[arg(long, short)]
         symbols: bool,
     },
 
@@ -82,7 +82,7 @@ fn main() {
             }
         }
         Command::Port { range } => {
-            let (start, end) = parse_range(range);
+            let (start, end) = parse_range(&range);
             println!("generated port range: {}-{}", start, end);
             for port in generate_port(start, end, cli.count) {
                 println!("{}", port);
@@ -113,18 +113,23 @@ fn main() {
     }
 }
 
-fn parse_range(range: String) -> (u16, u16) {
-    if range != DEFAULT_PORT_RANGE {
-        range
-            .split_once('-')
-            .map(|(s, e)| {
-                (
-                    s.parse::<u16>().unwrap_or(DEFAULT_PORT_STAR),
-                    e.parse::<u16>().unwrap_or(DEFAULT_PORT_END),
-                )
-            })
-            .unwrap_or((DEFAULT_PORT_STAR, DEFAULT_PORT_END))
-    } else {
-        (DEFAULT_PORT_STAR, DEFAULT_PORT_END)
+fn parse_range(range: &str) -> (u16, u16) {
+    if range == DEFAULT_PORT_RANGE {
+        return (DEFAULT_PORT_STAR, DEFAULT_PORT_END);
     }
+
+    range
+        .split_once('-')
+        .map(|(start, end)| {
+            let start = start.parse::<u16>().unwrap_or(DEFAULT_PORT_STAR);
+            let end = end.parse::<u16>().unwrap_or(DEFAULT_PORT_END);
+
+            let mid = start;
+
+            (
+                start.min(end).max(DEFAULT_PORT_STAR),
+                end.max(mid).min(DEFAULT_PORT_END),
+            )
+        })
+        .unwrap_or((DEFAULT_PORT_STAR, DEFAULT_PORT_END))
 }
