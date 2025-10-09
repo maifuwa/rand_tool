@@ -50,7 +50,7 @@ enum Command {
     },
 
     /// Generate UUIDs
-    UUID,
+    Uuid,
 
     /// Base64 encoding and decoding operations
     BASE64 {
@@ -86,7 +86,7 @@ fn main() {
                 println!("{}", port);
             }
         }
-        Command::UUID => {
+        Command::Uuid => {
             for uuid in generate_uuid(cli.count) {
                 println!("{}", uuid);
             }

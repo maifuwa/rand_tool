@@ -96,7 +96,7 @@ mod tests {
         let ports = generate_port(8000, 9000, 10);
         assert_eq!(ports.len(), 10);
         for port in ports {
-            assert!(port >= 8000 && port < 9000);
+            assert!((8000..9000).contains(&port));
         }
     }
 
