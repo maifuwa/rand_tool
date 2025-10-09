@@ -75,11 +75,9 @@ fn main() {
             lowercase,
             symbols,
         } => {
-            let pwd_and_score =
-                generate_pwd(length, numbers, uppercase, lowercase, symbols, cli.count);
-            for (pwd, score) in pwd_and_score {
-                println!("password: {}  score: {:.3}", pwd, score);
-            }
+            generate_pwd(length, numbers, uppercase, lowercase, symbols, cli.count)
+                .into_iter()
+                .for_each(|p| println!("{}", p));
         }
         Command::Port { range } => {
             let (start, end) = parse_range(&range);
@@ -132,4 +130,72 @@ fn parse_range(range: &str) -> (u16, u16) {
             )
         })
         .unwrap_or((DEFAULT_PORT_STAR, DEFAULT_PORT_END))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_range_default() {
+        let (start, end) = parse_range(DEFAULT_PORT_RANGE);
+        assert_eq!(start, DEFAULT_PORT_STAR);
+        assert_eq!(end, DEFAULT_PORT_END);
+    }
+
+    #[test]
+    fn test_parse_range_custom() {
+        let (start, end) = parse_range("8000-9000");
+        assert_eq!(start, 8000);
+        assert_eq!(end, 9000);
+    }
+
+    #[test]
+    fn test_parse_range_reversed() {
+        let (start, end) = parse_range("9000-8000");
+        assert_eq!(start, 8000);
+        assert_eq!(end, 9000);
+    }
+
+    #[test]
+    fn test_parse_range_below_minimum() {
+        let (start, end) = parse_range("500-2000");
+        assert_eq!(start, DEFAULT_PORT_STAR);
+        assert_eq!(end, 2000);
+    }
+
+    #[test]
+    fn test_parse_range_above_maximum() {
+        let (start, end) = parse_range("40000-60000");
+        assert_eq!(start, 40000);
+        assert_eq!(end, DEFAULT_PORT_END);
+    }
+
+    #[test]
+    fn test_parse_range_invalid_format() {
+        let (start, end) = parse_range("invalid");
+        assert_eq!(start, DEFAULT_PORT_STAR);
+        assert_eq!(end, DEFAULT_PORT_END);
+    }
+
+    #[test]
+    fn test_parse_range_invalid_numbers() {
+        let (start, end) = parse_range("abc-xyz");
+        assert_eq!(start, DEFAULT_PORT_STAR);
+        assert_eq!(end, DEFAULT_PORT_END);
+    }
+
+    #[test]
+    fn test_parse_range_partial_invalid() {
+        let (start, end) = parse_range("3000-invalid");
+        assert_eq!(start, 3000);
+        assert_eq!(end, DEFAULT_PORT_END);
+    }
+
+    #[test]
+    fn test_parse_range_same_values() {
+        let (start, end) = parse_range("5000-5000");
+        assert_eq!(start, 5000);
+        assert_eq!(end, 5000);
+    }
 }
