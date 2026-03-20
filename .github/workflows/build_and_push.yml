@@ -19,15 +19,12 @@ jobs:
   build_and_release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          components: rustfmt, clippy
-          override: true
+        run: |
+          rustup toolchain install stable --profile minimal --component rustfmt --component clippy
+          rustup override set stable
 
       - name: Format check
         run: cargo fmt --all -- --check
