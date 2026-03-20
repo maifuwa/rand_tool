@@ -10,16 +10,13 @@ A formidable random number generator capable of producing passwords,
 service ports, and UUIDs, alongside the ability to encode and decode Base64.
 """
 
-[[bin]]
-name = "rand_tool"
-path = "src/bin/cli.rs"
-
 [dependencies]
 clap = { version = "4", features = ["derive"] }
 passwords = "3"
-rand = "0.9.2"
+rand = "0.10.0"
 uuid = { version = "1", features = ["v4"] }
 base64 = "0.22.1"
+thiserror = "2"
 
 [dev-dependencies]
 assert_cmd = "2"

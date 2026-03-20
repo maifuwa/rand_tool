@@ -59,11 +59,15 @@ rand_tool -c 10 port --range 8000-9000
 
 # Generate ports in specific range
 rand_tool port -r 3000-3100
+
+# Generate unique ports without duplicates
+rand_tool -c 10 port --range 8000-9000 --unique
 ```
 
 **Options:**
 - `-c, --count <COUNT>`: Number of ports to generate (default: 5)
 - `-r, --range <RANGE>`: Port range in format "min-max" (default: 1024-49151)
+- `--unique`: Generate unique ports without duplicates
 
 ### UUID Generation
 
@@ -92,6 +96,8 @@ rand_tool base64 --decode "SGVsbG8sIFdvcmxkIQ=="
 **Options:**
 - `-e, --encode <STRING>`: Encode UTF-8 string to Base64
 - `-d, --decode <STRING>`: Decode Base64 string to UTF-8
+
+Exactly one of `--encode` or `--decode` is required.
 
 ## Global Options
 
